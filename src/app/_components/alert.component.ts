@@ -1,4 +1,4 @@
-import { ɵinjectChangeDetectorRef, Component, OnInit, OnDestroy, Input } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, Input } from "@angular/core";
 import { Router, NavigationStart } from "@angular/router";
 import { Subscription } from "rxjs";
 
@@ -42,6 +42,60 @@ export class AlertComponent implements OnInit, OnDestroy {
                 if(alert.autoClose){
                     setTimeout(() => this.removeAlert(alert), 3000)
                 }
-            })
+            });
+        
+
+        this.routeSubscription = this.router.events.subscribe(event => {
+            if (event instanceof NavigationStart) {
+                this.alertService.clear(this.id);
+                this.scheduleDetectChanges();
+            }
+        });
+    }
+
+    ngOnDestroy() {
+        //unsubscribe to avoid memory leaks
+        this.alertSubscription.unsubscribe();
+        this.routeSubscription.unsubscribe();
+    }
+
+    removeAlert(alert: Alert) {
+
+        //check if already removed to prevent error on auto close
+        if (!this.alerts.includes(alert)) return;
+
+        if(this.fade) {
+            alert.fade = true;
+            this.scheduleDetectChanges();
+
+            setTimeout(() => {
+                this.alerts = this.alerts.filter(x => x !== alert);
+                this.scheduleDetectChanges();
+            }, 250);
+        }else {
+            this.alerts = this.alerts.filter(x => x !== alert);
+            this.scheduleDetectChanges();
+        }
+    }
+
+    cssClasses(alert: Alert) {
+        if (!alert) return;
+
+        const classes = ['alert', 'alert-dismissable', 'mt-4', 'container'];
+
+        const alertTypeClass = {
+            [AlertType.Success] : 'alert-success',
+            [AlertType.Error]: 'alert-danger',
+            [AlertType.Info]: 'alert-info',
+            [AlertType.Warning]: 'alert-warning'
+        }
+
+        if (alert.type !== undefined) {
+            classes.push(alertTypeClass[alert.type]);
+        }
+
+        if (alert.fade) {
+            classes.push('fade');
+        }
     }
 }
