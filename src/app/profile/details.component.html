@@ -1,0 +1,30 @@
+<div class="card">
+  <h4 class="card-header">My Profile</h4>
+  <div class="card-body">
+    <table class="table table-bordered table-striped">
+      <tbody>
+        <tr>
+          <th style="width: 30%">Title</th>
+          <td>{{ account?.title }}</td>
+        </tr>
+        <tr>
+          <th>First Name</th>
+          <td>{{ account?.firstName }}</td>
+        </tr>
+        <tr>
+          <th>Last Name</th>
+          <td>{{ account?.lastName }}</td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td>{{ account?.email }}</td>
+        </tr>
+        <tr>
+          <th>Role</th>
+          <td>{{ account?.role }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <a routerLink="update" class="btn btn-primary">Update Profile</a>
+  </div>
+</div>
