@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AccountService } from '@app/services';
-import { Account } from '@app/models';
+import { AccountService } from '@app/_services';
+import { Account } from '@app/_models';
 
 @Component({
   selector: 'app-root',

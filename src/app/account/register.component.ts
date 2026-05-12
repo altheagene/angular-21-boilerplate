@@ -3,8 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { AccountService, AlertService } from '@app_services';
-import { MustMatch } from '@app_helpers';
+import { AccountService, AlertService } from '@app/_services';
+import { MustMatch } from '@app/_helpers';
 
 @Component({ templateUrl: 'register.component.html', standalone: false })
 export class RegisterComponent implements OnInit {
@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
       .subscribe({
         next: () => {
           this.alertService.success('Registration successful, please check your email for verification instructions', { keepAfterRouteChange: true });
-          this.router.navigate(['./login'], { relativeTo: this.route });
+          this.router.navigate(['./login'], { relativeTo: this.route,  queryParams: { registered: 'success' } });
         },
         error: error => {
           this.alertService.error(error);

@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { AccountService, AlertService } from '@app/services';
+import { AccountService, AlertService } from '@app/_services';
 
 @Component({ templateUrl: 'login.component.html', standalone: false })
 export class LoginComponent implements OnInit {
@@ -24,6 +24,16 @@ export class LoginComponent implements OnInit {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
+    });
+
+    // Check if user just registered
+    this.route.queryParams.subscribe(params => {
+      if (params['registered'] === 'success') {
+        this.alertService.success(
+          'Registration successful! Please check your email for verification instructions before logging in.',
+          { keepAfterRouteChange: true, autoClose: false }
+        );
+      }
     });
   }
 

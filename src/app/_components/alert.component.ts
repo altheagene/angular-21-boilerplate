@@ -97,5 +97,7 @@ export class AlertComponent implements OnInit, OnDestroy {
         if (alert.fade) {
             classes.push('fade');
         }
+        return classes.join(' ');
+
     }
 }
