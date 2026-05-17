@@ -26,60 +26,58 @@ export class AddEditComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+ngOnInit() {
+    
+    // Method 1: Get from snapshot
     this.id = this.route.snapshot.params['id'];
-
-    this.form = this.formBuilder.group({
-      title: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      role: ['', Validators.required],
-      // password only required in add mode
-      password: ['', [Validators.minLength(6), ...(!this.id ? [Validators.required] : [])]],
-      confirmPassword: ['']
-    }, {
-      validator: MustMatch('password', 'confirmPassword')
-    });
-
-    this.title = 'Create Account';
-    if (this.id) {
-      this.title = 'Edit Account';
-      this.loading = true;
-      this.cdr.detectChanges();
-
-      this.loadTimeoutId = window.setTimeout(() => {
-        if (this.loading) {
-          this.loading = false;
-          this.alertService.error('Request timed out');
-          this.cdr.detectChanges();
+    
+    // Method 2: Subscribe to params (in case they change)
+    this.route.params.subscribe(params => {
+        this.id = params['id'];
+        
+        // If ID exists, load the data
+        if (this.id) {
+            this.loadAccountData();
         }
-      }, 10000);
+    });
+    
+    // Create form
+    this.form = this.formBuilder.group({
+        title: ['', Validators.required],
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        role: ['', Validators.required],
+        password: ['', [Validators.minLength(6)]],
+        confirmPassword: ['']
+    }, {
+        validator: MustMatch('password', 'confirmPassword')
+    });
+    
+    this.title = this.id ? 'Edit Account' : 'Create Account';
+}
 
-      this.accountService.getById(this.id)
-        .pipe(
-          first(),
-          finalize(() => {
+// Separate method to load account data
+loadAccountData() {
+    
+    this.loading = true;
+    this.cdr.detectChanges();
+    
+    // DIRECT SUBSCRIPTION - NO PIPES
+    this.accountService.getById(this.id!).subscribe({
+        next: (data) => {
+            this.form.patchValue(data);
             this.loading = false;
-            if (this.loadTimeoutId) {
-              window.clearTimeout(this.loadTimeoutId);
-              this.loadTimeoutId = undefined;
-            }
             this.cdr.detectChanges();
-          })
-        )
-        .subscribe({
-          next: (x) => {
-            this.form.patchValue(x);
+        },
+        error: (err) => {
+            this.alertService.error('Failed to load account');
+            this.loading = false;
             this.cdr.detectChanges();
-          },
-          error: (error) => {
-            this.alertService.error(error);
-            this.cdr.detectChanges();
-          }
-        });
-    }
-  }
+        }
+    });
+    
+}
 
   ngOnDestroy() {
     if (this.loadTimeoutId) {

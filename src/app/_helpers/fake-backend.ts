@@ -239,7 +239,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
       const account = body;
       if (accounts.find(x => x.email === account.email)) {
-        return error(`Email ${account.email} is already registered`);
+        return error(`Email ${account.email} is already  registered`);
       }
 
       // assign account id and a few other properties then save
